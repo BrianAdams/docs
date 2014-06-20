@@ -22,19 +22,11 @@ If you use Java, Ruby, PHP or node.js, you can use one of the below API librarie
 
 Users can authenticate using a [HTTP Basic Authentication][5] base64 encoded _Username_ and _API Access Key_. The easiest way to authenticate is to include the Sauce username and access key in the request URL.
 
-*Note: All requests **must** have the `Content-Type` header set to `application/json`.*
-
-Here is an example retreiving a user's recent jobs:
-
-```bash
-curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs
-```
-
-Note that all below endpoints default to a `GET` request unless specified.
+Note that all below endpoints default to a `GET` request unless specified. If you are on Windows, you can download cURL [here](http://curl.haxx.se/download.html) to test out the API endpoints. All requests **must** have the `Content-Type` header set to `application/json`.
 
 ## Account
 
-> Access account information and create new sub-accounts.
+Access account information and create new sub-accounts.
 
 ### Get User
 
@@ -49,13 +41,13 @@ curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/users/sauceUsern
 
 ### Create User
 
-> Create a sub-account.
+> Create a sub-account from a specified parent username.
 
-URL: `https://saucelabs.com/rest/v1/users/:username`
+URL: `https://saucelabs.com/rest/v1/users/:parent_username`
 
 Method: `POST`
 
-Required `POST` data:
+**Required POST data:**
 
 - username
 - password
@@ -104,36 +96,6 @@ URL: `https://saucelabs.com/rest/v1/users/:username/usage`
 ```bash
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/users/sauceUsername/usage
 ```
-Result:
-
-```json
-{
-  "usage": [
-    [
-      "2011-3-18",
-      [
-        2,
-        38
-      ]
-    ],
-    [
-      "2011-3-31",
-      [
-        5,
-        5533
-      ]
-    ],
-    [
-      "2011-4-1",
-      [
-        7,
-        5076
-      ]
-    ]
-  ],
-  "username": "sauceUsername"
-}
-```
 
 ## Jobs
 
@@ -150,10 +112,10 @@ curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jo
 
 Optional params:
 
-#### limit jobs
+**limit jobs**
 > Displays the specified number of jobs, instead of truncating the list at the default 100.
 
-URL: `https://saucelabs.com/rest/v1/?limit=`
+URL: `https://saucelabs.com/rest/v1/:username/jobs?limit=:number_of_jobs`
 
 Default: `100`
 
@@ -162,10 +124,10 @@ Example getting last 200 job ids:
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs?limit=200
 ```
 
-#### get full jobs
+**get full jobs**
 > Returns full job information, rather than just IDs.
 
-URL: `https://saucelabs.com/rest/v1/?full=`
+URL: `https://saucelabs.com/rest/v1/:username/jobs?full=:full`
 
 Default: `false`
 
@@ -192,10 +154,10 @@ Example getting full information about last 100 jobs:
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs?full=true
 ```
 
-#### skip jobs
+**skip jobs**
 > Skips the specified number of jobs.
 
-URL: `https://saucelabs.com/rest/v1/?skip=`
+URL: `https://saucelabs.com/rest/v1/:username/jobs?skip=:number_of_jobs`
 
 Default: `0`
 
@@ -204,19 +166,19 @@ Example getting last 100 job ids skipping 20 most recent jobs:
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs?skip=20
 ```
 
-#### jobs to and from specified times
+**jobs to and from specified times**
 > Returns jobs since/until the specified time (in epoch time, calculated from UTC).
 
-URL: `https://saucelabs.com/rest/v1/?to=` and `?from=`
+URL: `https://saucelabs.com/rest/v1/:username/jobs?to=:until` and `?from=:since`
 
 ```bash
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs?from=1357747500&to=1357748700
 ```
 
-#### format jobs
-> Returns jobs in specified format. Currently we support `json` and `csv`.
+**format jobs**
+> Returns jobs in specified format. Currently `json` and `csv` are supported.
 
-URL: `https://saucelabs.com/rest/v1/?format=`
+URL: `https://saucelabs.com/rest/v1/:username/jobs?format=:job_format`
 
 Default: `json`
 
@@ -276,7 +238,7 @@ curl -X PUT https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUser
 
 ###  Get Job Asset Names
 
-> Get a details about the static assets collected for a specific job.
+> Get details about the static assets collected for a specific job.
 
 URL: `https://saucelabs.com/rest/v1/:username/jobs/:job_id/assets`
 
@@ -292,11 +254,11 @@ Example:
 curl https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceUsername/jobs/YOUR_JOB_ID/assets
 ```
 
-### Get Job Asset Files
-
-URL: `https://saucelabs.com/rest/v1/:username/jobs/:job_id/assets/:file_name`
+### Get Job Asset File
 
 > Download every asset created after your test runs on Sauce through our REST API. These include the video recording, Selenium log, and screenshots taken on crucial steps.
+
+URL: `https://saucelabs.com/rest/v1/:username/jobs/:job_id/assets/:file_name`
 
 Available Values for `:file_name`:
 
@@ -384,17 +346,6 @@ URL: `https://saucelabs.com/rest/v1/info/status`
 curl -X GET http://saucelabs.com/rest/v1/info/status
 ```
 
-Result:
-
-```json
-{
-  "wait_time": 0.5,
-  "service_operational": true,
-  "status_message": "Basic service status checks passed."
-}
-```
-
-
 ### Get Supported Browsers
 
 URL: `https://saucelabs.com/rest/v1/info/browsers/:selenum_version`
@@ -454,7 +405,7 @@ curl -X DELETE https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/sauceU
 
 ## Temporary Storage
 
-Sauce Labs provides temporary storage inside our network for mobile apps, Selenium jars, prerun executables, and other assets required by your tests. Storing assets in our network can eliminate network latency problems when sending big files to Sauce. Here's how you use our storage:
+Sauce Labs provides temporary storage inside our network for mobile apps, Selenium jars, prerun executables, and other assets required by your tests. Storing assets in our network can eliminate network latency problems when sending big files to Sauce. Here's how you can use our storage:
 
 ### Upload File
 
@@ -493,11 +444,11 @@ URL `:username/js-tests`
 
 Method: `POST`
 
-Required `POST` data:
+Required POST data:
 
 `platforms`: an array of platforms
 `url`:  should point to the page that hosts your tests.
-`framework` can be `"qunit"`, `"jasmine"`, `"YUI Test"`, `"mocha"`, or `"custom"`.
+`framework`: can be `"qunit"`, `"jasmine"`, `"YUI Test"`, `"mocha"`, or `"custom"`.
 
 The `"custom"` framework allows you to display generic test information on the Sauce Labs website. Set `window.global_test_results` on the javascript on your unit test page to an object that looks like the following and Sauce will report any failing tests: `
 
@@ -681,9 +632,6 @@ URL: `https://saucelabs.com/rest/v1/bugs/query/ids=[:id_1,:id_2]`
 ```bash
 curl -G https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/bugs/query/ --data-urlencode 'ids=[""YOUR_BUG_ID, "0123401234-example-id-12345"]'
 ```
-Result:
-
-    List of JSON objects containing detailed info on each queried bug id
 
 ### Update Bug
 
@@ -698,14 +646,6 @@ curl -G https://sauceUsername:sauceAccessKey@saucelabs.com/rest/v1/bugs/update/Y
 ```
 
 **Valid keys: **Only following bug properties can be modified with the API: 'Title', 'Description'.
-
-Result(After successful command execution):
-
-```json
-{
-  "status": "success"
-}
-```
 
    [1]: http://en.wikipedia.org/wiki/Representational_State_Transfer
    [2]: http://en.wikipedia.org/wiki/HTTP
